@@ -39,17 +39,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
 /*----------------------------------------------------------------------------*/
 /* Configure GPIO                                                             */
 /*----------------------------------------------------------------------------*/
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
 /** Configure pins as 
         * Analog 
         * Input 
@@ -60,27 +52,35 @@
 void MX_GPIO_Init(void)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitTypeDef GPIO_InitStruct;                                  
+                                                                      
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+                                                                      
+    /*Configure GPIO pins : PAPin PAPin */
+    GPIO_InitStruct.Pin = drdy_1_in_Pin|drdy2_in_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+                                                                      
+    // led control, open drain pin
+    GPIO_InitStruct.Pin = led_out_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;  // open drain!
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(led_out_GPIO_Port, &GPIO_InitStruct);
+    
+    // turn led on
+    HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET);
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+	// configure spi2 (pressure sensor) chip select
+    GPIO_InitStruct.Pin = spi2cs_out_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;  
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(spi2cs_out_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : PAPin PAPin */
-  GPIO_InitStruct.Pin = drdy_1_in_Pin|drdy2_in_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = led_out_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(led_out_GPIO_Port, &GPIO_InitStruct);
 
 }
 

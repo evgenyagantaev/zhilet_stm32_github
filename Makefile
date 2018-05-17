@@ -22,7 +22,7 @@ TARGET = zhilet_stm32_00_01
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -Og
+OPT = -O0
 
 
 #######################################

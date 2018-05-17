@@ -57,6 +57,33 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 
+
+
+uint8_t write_byte(uint8_t data)
+{
+
+	uint8_t data_out;
+    uint8_t read_data;
+
+	// wait for spi transmitter readiness
+	while ((SPI2->SR & SPI_SR_TXE) == RESET );
+	data_out = data;
+    SPI2->DR = data_out;
+    // wait while a transmission complete
+	while ((SPI2->SR & SPI_SR_RXNE) == RESET );
+    read_data = SPI2->DR;
+	
+	return read_data;
+
+	
+}
+
+
+
+
+
+
+
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
@@ -102,8 +129,136 @@ int main(void)
   	MX_USART1_UART_Init();
   	
   
-  	HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET);
+  	HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
 
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	uint8_t spi2_out_data_buffer[128];
+	uint8_t spi2_in_data_buffer[128];
+
+	uint8_t data_out;
+    uint8_t read_data;
+
+
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	//                 RESET
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	// reset spi2 cs pin
+    spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ; 	
+	// transmit 0x1e                             	
+	write_byte( 0x1e);                         	
+	// set spi2 cs pin                           	
+    spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;	
+	HAL_Delay(3);
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	uint16_t sensor_prom[7];
+
+	for(i=1; i<7; i++)
+	{
+		//send read prom command
+		// reset spi2 cs pin
+    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		// transmit command with address 
+		write_byte( 0xa0 + (((uint8_t)i)<<1));
+
+		// read ms byte
+		sensor_prom[i] = write_byte(0x55);
+		sensor_prom[i] <<= 8;
+		// read ls byte
+		sensor_prom[i] += write_byte(0x55);
+
+		// set spi2 cs pin
+    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+	}
+
+
+	uint32_t pressure;
+	uint32_t temperature;
+
+/*
+	while(1)
+	{
+
+		//send start conversion D1 OSR 1024 command
+		// reset spi2 cs pin
+    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		// transmit command  
+		write_byte(0x44);
+		// set spi2 cs pin
+    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+
+		// pause 3 mS
+		HAL_Delay(3);
+		
+
+		//send read adc command
+		// reset spi2 cs pin
+    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		// transmit command 
+		write_byte(0x00);
+
+		// read ms byte
+		pressure = write_byte(0x55);
+		pressure <<= 8;
+		// read ls byte
+		pressure += write_byte(0x55);
+		pressure <<= 8;
+		// read ls byte
+		pressure += write_byte(0x55);
+		pressure <<= 8;
+		// read ls byte
+		pressure += write_byte(0x55);
+		pressure <<= 8;
+
+		// set spi2 cs pin
+    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+		
+		//send start conversion D2 OSR 1024 command
+		// reset spi2 cs pin
+    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		// transmit command  
+		write_byte(0x54);
+		// set spi2 cs pin
+    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+
+		// pause 3 mS
+		HAL_Delay(3);
+		
+
+		//send read adc command
+		// reset spi2 cs pin
+    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		// transmit command 
+		write_byte(0x00);
+
+		// read ms byte
+		temperature = write_byte(0x55);
+		temperature <<= 8;
+		// read ls byte
+		temperature += write_byte(0x55);
+		temperature <<= 8;
+		// read ls byte
+		temperature += write_byte(0x55);
+		temperature <<= 8;
+		// read ls byte
+		temperature += write_byte(0x55);
+		temperature <<= 8;
+
+		// set spi2 cs pin
+    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+
+
+		sprintf(message, "press = %d;   temp = %d;\r\n", pressure, temperature);
+		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
+
+		
+	}
+*/
+	
+
+//*
   	while (1)
   	{
 	  	HAL_Delay(1500);
@@ -123,6 +278,7 @@ int main(void)
 		sprintf(message, "led on\r\n");
 		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
   	}
+//*/
 
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

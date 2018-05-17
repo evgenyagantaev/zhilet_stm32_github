@@ -55,6 +55,8 @@
 #define led_out_GPIO_Port GPIOB
 #define drdy2_in_Pin GPIO_PIN_8
 #define drdy2_in_GPIO_Port GPIOA
+#define spi2cs_out_Pin GPIO_PIN_12
+#define spi2cs_out_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**
