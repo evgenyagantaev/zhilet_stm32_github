@@ -259,12 +259,12 @@ int main(void)
 		actual_temperature = 2000 + (dT*sensor_prom[6])/DEG_2_23;
 
 		OFF = sensor_prom[2]*DEG_2_18 + (sensor_prom[4]*dT)/DEG_2_5;
-		SENS = sensor_prom[1]*((int32_t)0x20000) + sensor_prom[3]*dT/((uint32_t)0x80);
-		P = (pressure*SENS/((int32_t)0x200000) - OFF)/((int32_t)0x8000);
+		SENS = sensor_prom[1]*DEG_2_17 + (sensor_prom[3]*dT)/DEG_2_7;
+		P = ((pressure*SENS)/DEG_2_21 - OFF)/DEG_2_15;
 
 
-		sprintf(message, "press = %d;   temp = %d;\r\n", P, actual_temperature);
-		//sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
+		//sprintf(message, "press = %d;   temp = %d;\r\n", P, actual_temperature);
+		sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
 		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
 
 		// pause 1 S
