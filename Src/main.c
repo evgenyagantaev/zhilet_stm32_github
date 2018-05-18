@@ -182,6 +182,17 @@ int main(void)
 	int32_t SENS;
 	int32_t P;
 
+#define DEG_2_8 256
+#define DEG_2_23 8388608
+#define DEG_2_18 262144
+#define DEG_2_5 32
+#define DEG_2_17 131072
+#define DEG_2_7 128
+#define DEG_2_21 2097152
+#define DEG_2_15 32768
+
+
+
 //*
 	while(1)
 	{
@@ -193,10 +204,8 @@ int main(void)
 		write_byte(0x44);
 		// set spi2 cs pin
     	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
-
 		// pause 3 mS
 		HAL_Delay(3);
-		
 
 		//send read adc command
 		// reset spi2 cs pin
@@ -205,19 +214,17 @@ int main(void)
 		write_byte(0x00);
 
 		// read ms byte
-		write_byte(0x55);
-		pressure = 0;
-		// read ls byte
-		pressure += write_byte(0x55);
+		pressure = write_byte(0x55);
 		pressure <<= 8;
 		// read ls byte
 		pressure += write_byte(0x55);
 		pressure <<= 8;
 		// read ls byte
 		pressure += write_byte(0x55);
-
 		// set spi2 cs pin
     	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+
+		//----------------------------------------------------
 		
 		//send start conversion D2 OSR 1024 command
 		// reset spi2 cs pin
@@ -226,10 +233,8 @@ int main(void)
 		write_byte(0x54);
 		// set spi2 cs pin
     	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
-
 		// pause 3 mS
 		HAL_Delay(3);
-		
 
 		//send read adc command
 		// reset spi2 cs pin
@@ -238,29 +243,28 @@ int main(void)
 		write_byte(0x00);
 
 		// read ms byte
-		write_byte(0x55);
-		temperature = 0;
-		// read ls byte
-		temperature += write_byte(0x55);
+		temperature = write_byte(0x55);
 		temperature <<= 8;
 		// read ls byte
 		temperature += write_byte(0x55);
 		temperature <<= 8;
 		// read ls byte
 		temperature += write_byte(0x55);
-
 		// set spi2 cs pin
     	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
 
-		dT = temperature - sensor_prom[5]*((int32_t)0x100);
-		actual_temperature = 2000 + dT*sensor_prom[6]/((uint32_t)0x800000);
+		//---------------------------------------------------
 
-		OFF = sensor_prom[2]*((int32_t)0x40000) + sensor_prom[4]*dT/((uint32_t)0x20);
+		dT = temperature - sensor_prom[5]*DEG_2_8;
+		actual_temperature = 2000 + (dT*sensor_prom[6])/DEG_2_23;
+
+		OFF = sensor_prom[2]*DEG_2_18 + (sensor_prom[4]*dT)/DEG_2_5;
 		SENS = sensor_prom[1]*((int32_t)0x20000) + sensor_prom[3]*dT/((uint32_t)0x80);
 		P = (pressure*SENS/((int32_t)0x200000) - OFF)/((int32_t)0x8000);
 
 
 		sprintf(message, "press = %d;   temp = %d;\r\n", P, actual_temperature);
+		//sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
 		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
 
 		// pause 1 S
