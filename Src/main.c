@@ -53,6 +53,8 @@
 #define DEG_2_15 32768.0
 #define DEG_2_33 8589934592.0
 
+#define PRESSURE_OVERSAMPLING 100
+
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
@@ -195,32 +197,43 @@ int main(void)
 	while(1)
 	{
 
-		//send start conversion D1 OSR 1024 command
-		// reset spi2 cs pin
-    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
-		// transmit command  
-		write_byte(0x44);
-		// set spi2 cs pin
-    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
-		// pause 3 mS
-		HAL_Delay(3);
+		uint32_t aux_p = 0;
 
-		//send read adc command
-		// reset spi2 cs pin
-    	spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
-		// transmit command 
-		write_byte(0x00);
+		for(i=0; i<PRESSURE_OVERSAMPLING; i++)
+		{
 
-		// read ms byte
-		pressure = write_byte(0x55);
-		pressure <<= 8;
-		// read ls byte
-		pressure += write_byte(0x55);
-		pressure <<= 8;
-		// read ls byte
-		pressure += write_byte(0x55);
-		// set spi2 cs pin
-    	spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+			//send start conversion D1 OSR 1024 command
+		    // reset spi2 cs pin
+    	    spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		    // transmit command  
+		    write_byte(0x44);
+		    // set spi2 cs pin
+    	    spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+		    // pause 3 mS
+		    HAL_Delay(3);
+                                                         
+		    //send read adc command
+		    // reset spi2 cs pin
+    	    spi2cs_out_GPIO_Port->BRR = spi2cs_out_Pin ;
+		    // transmit command 
+		    write_byte(0x00);
+                                                         
+		    // read ms byte
+		    pressure = write_byte(0x55);
+		    pressure <<= 8;
+		    // read ls byte
+		    pressure += write_byte(0x55);
+		    pressure <<= 8;
+		    // read ls byte
+		    pressure += write_byte(0x55);
+		    // set spi2 cs pin
+    	    spi2cs_out_GPIO_Port->BSRR = spi2cs_out_Pin ;
+
+			aux_p += pressure;
+
+		}
+
+		pressure = aux_p/PRESSURE_OVERSAMPLING;
 
 		//----------------------------------------------------
 		
