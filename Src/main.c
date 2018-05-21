@@ -43,9 +43,14 @@
 #include "usart.h"
 #include "gpio.h"
 
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
+#define DEG_2_8 256.0
+#define DEG_2_23 8388608.0
+#define DEG_2_18 262144.0
+#define DEG_2_5 32.0
+#define DEG_2_17 131072.0
+#define DEG_2_7 128.0
+#define DEG_2_21 2097152.0
+#define DEG_2_15 32768.0
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -176,20 +181,12 @@ int main(void)
 
 	uint32_t pressure;
 	uint32_t temperature;
-	int32_t dT;
-	int32_t actual_temperature;
-	int32_t OFF;
-	int32_t SENS;
-	int32_t P;
+	double dT;
+	double actual_temperature;
+	double OFF;
+	double SENS;
+	double P;
 
-#define DEG_2_8 256
-#define DEG_2_23 8388608
-#define DEG_2_18 262144
-#define DEG_2_5 32
-#define DEG_2_17 131072
-#define DEG_2_7 128
-#define DEG_2_21 2097152
-#define DEG_2_15 32768
 
 
 
@@ -255,16 +252,16 @@ int main(void)
 
 		//---------------------------------------------------
 
-		dT = temperature - sensor_prom[5]*DEG_2_8;
-		actual_temperature = 2000 + (dT*sensor_prom[6])/DEG_2_23;
+		dT = (double)temperature - (double)sensor_prom[5]*DEG_2_8;
+		actual_temperature = 2000 + (dT*((double)sensor_prom[6]))/DEG_2_23;
 
-		OFF = sensor_prom[2]*DEG_2_18 + (sensor_prom[4]*dT)/DEG_2_5;
-		SENS = sensor_prom[1]*DEG_2_17 + (sensor_prom[3]*dT)/DEG_2_7;
-		P = ((pressure*SENS)/DEG_2_21 - OFF)/DEG_2_15;
+		OFF = ((double)sensor_prom[2])*DEG_2_18 + (((double)sensor_prom[4])*dT)/DEG_2_5;
+		SENS = ((double)sensor_prom[1])*DEG_2_17 + (((double)sensor_prom[3])*dT)/DEG_2_7;
+		P = (((double)pressure*SENS)/DEG_2_21 - OFF)/DEG_2_15;
 
 
-		//sprintf(message, "press = %d;   temp = %d;\r\n", P, actual_temperature);
-		sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
+		sprintf(message, "press = %d;   temp = %d;\r\n", (int32_t)P, (int32_t)actual_temperature);
+		//sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
 		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
 
 		// pause 1 S
