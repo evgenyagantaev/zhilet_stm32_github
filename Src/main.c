@@ -51,6 +51,7 @@
 #define DEG_2_7 128.0
 #define DEG_2_21 2097152.0
 #define DEG_2_15 32768.0
+#define DEG_2_33 8589934592.0
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -257,8 +258,39 @@ int main(void)
 
 		OFF = ((double)sensor_prom[2])*DEG_2_18 + (((double)sensor_prom[4])*dT)/DEG_2_5;
 		SENS = ((double)sensor_prom[1])*DEG_2_17 + (((double)sensor_prom[3])*dT)/DEG_2_7;
-		P = (((double)pressure*SENS)/DEG_2_21 - OFF)/DEG_2_15;
 
+
+		double T2;
+		double SENS2;
+		double OFF2;
+
+
+		if(actual_temperature >= 2000)
+		{
+			T2 = 0;
+			SENS2 = 0;
+			OFF2 = 0;
+		}
+		else 
+		{
+			T2 = 3.0 * dT * dT / DEG_2_33;
+			double aux_dt = (actual_temperature - 2000);
+			OFF2 = 3.0 * aux_dt * aux_dt / 8.0;
+			SENS2 = 7.0 * aux_dt * aux_dt / 8.0;
+
+			if(actual_temperature < -1500)
+			{
+				double aux_dt = actual_temperature + 1500;
+				SENS2 = SENS2 + 3.0 * aux_dt * aux_dt;
+			}
+		}
+
+		actual_temperature = actual_temperature - T2;
+		
+		OFF = OFF - OFF2;
+		SENS = SENS - SENS2;
+
+		P = (((double)pressure*SENS)/DEG_2_21 - OFF)/DEG_2_15;
 
 		sprintf(message, "press = %d;   temp = %d;\r\n", (int32_t)P, (int32_t)actual_temperature);
 		//sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
