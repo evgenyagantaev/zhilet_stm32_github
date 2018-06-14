@@ -81,6 +81,21 @@ void MX_GPIO_Init(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(spi2cs_out_GPIO_Port, &GPIO_InitStruct);
 
+	// configure jumpers
+    GPIO_InitStruct.Pin = GPIO_PIN_10 |GPIO_PIN_12; // pa10 24 m; pa12 40 m
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	// configure actuators
+    GPIO_InitStruct.Pin = GPIO_PIN_9 |GPIO_PIN_11; 
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	// turn actuators off
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 
 }
 

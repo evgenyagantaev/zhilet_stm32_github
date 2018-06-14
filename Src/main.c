@@ -190,8 +190,14 @@ int main(void)
 	double SENS;
 	double P;
 
+	double threshold;
 
-
+	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_RESET)
+		threshold = THRESHOLD1;
+	else if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11) == GPIO_PIN_RESET)
+		threshold = THRESHOLD2;
+	else
+		threshold = THRESHOLD0;
 
 //*
 	while(1)
