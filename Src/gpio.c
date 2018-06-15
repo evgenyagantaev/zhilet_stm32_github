@@ -97,6 +97,8 @@ void MX_GPIO_Init(void)
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 
+	
+
 }
 
 /* USER CODE BEGIN 2 */

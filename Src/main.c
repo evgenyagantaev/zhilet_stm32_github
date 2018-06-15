@@ -55,6 +55,10 @@
 
 #define PRESSURE_OVERSAMPLING 100
 
+#define THRESHOLD0 110000
+#define THRESHOLD1 340000
+#define THRESHOLD2 500000
+
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
@@ -199,6 +203,9 @@ int main(void)
 	else
 		threshold = THRESHOLD0;
 
+	// DEBUG ************************
+	threshold = THRESHOLD0;
+
 //*
 	while(1)
 	{
@@ -314,6 +321,16 @@ int main(void)
 		sprintf(message, "press = %d;   temp = %d;\r\n", (int32_t)P, (int32_t)actual_temperature);
 		//sprintf(message, "press = %u;   temp = %u;\r\n", pressure, temperature);
 		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
+
+
+		// check threshold ****************************************************************
+		if(P > threshold)
+		{
+			// turn actuators on
+    		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+
+		}
 
 		// pause 1 S
 		HAL_Delay(1000);
