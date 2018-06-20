@@ -196,15 +196,15 @@ int main(void)
 
 	double threshold;
 
-	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_RESET)
+	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == GPIO_PIN_RESET)
 		threshold = THRESHOLD1;
-	else if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11) == GPIO_PIN_RESET)
+	else if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12) == GPIO_PIN_RESET)
 		threshold = THRESHOLD2;
 	else
 		threshold = THRESHOLD0;
 
 	// DEBUG ************************
-	threshold = THRESHOLD0;
+	//threshold = THRESHOLD0;
 
 //*
 	while(1)
