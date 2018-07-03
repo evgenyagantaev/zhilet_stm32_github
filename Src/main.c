@@ -330,6 +330,16 @@ int main(void)
     		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
 
+			// delay 5 sec
+			HAL_Delay(21000);
+
+			// turn actuators off
+    		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+			
+			// stop
+			while(1);
+
 		}
 
 		// pause 1 S
