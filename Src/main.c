@@ -326,6 +326,9 @@ int main(void)
 		// check threshold ****************************************************************
 		if(P > threshold)
 		{
+			// turn led on
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+
 			// turn actuators on
     		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
@@ -342,34 +345,51 @@ int main(void)
 
 		}
 
-		// pause 1 S
-		HAL_Delay(1000);
+		// blinking and pause 1 Sec
+
+		if(threshold == THRESHOLD0)
+		{
+			// one blink 0.2 sec
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+			HAL_Delay(200);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_SET); // turn led off
+			HAL_Delay(800);
+		}
+		else if(threshold == THRESHOLD1)
+		{
+			// two blinks 0.1 sec
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+			HAL_Delay(100);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_SET); // turn led off
+			HAL_Delay(100);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+			HAL_Delay(100);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_SET); // turn led off
+			HAL_Delay(700);
+		}
+		else
+		{
+			// three blinks 0.1 sec
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+			HAL_Delay(50);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_SET); // turn led off
+			HAL_Delay(200);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+			HAL_Delay(50);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_SET); // turn led off
+			HAL_Delay(200);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_RESET); // turn led on
+			HAL_Delay(50);
+  			HAL_GPIO_WritePin(led_out_GPIO_Port, led_out_Pin, GPIO_PIN_SET); // turn led off
+			HAL_Delay(450);
+		}
+
+		//HAL_Delay(1000);
 		
 	}
 //*/
 	
 
-/*
-  	while (1)
-  	{
-	  	HAL_Delay(1500);
-	  	HAL_GPIO_TogglePin(led_out_GPIO_Port, led_out_Pin); //
-		sprintf(message, "led off\r\n");
-		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
-	  	HAL_Delay(500);
-	  	HAL_GPIO_TogglePin(led_out_GPIO_Port, led_out_Pin); //
-		sprintf(message, "led on\r\n");
-		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
-	  	HAL_Delay(500);
-	  	HAL_GPIO_TogglePin(led_out_GPIO_Port, led_out_Pin); //
-		sprintf(message, "led off\r\n");
-		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
-	  	HAL_Delay(500);
-	  	HAL_GPIO_TogglePin(led_out_GPIO_Port, led_out_Pin); //
-		sprintf(message, "led on\r\n");
-		HAL_UART_Transmit(&huart1, message, strlen((const char *)message), 500);
-  	}
-//*/
 
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
